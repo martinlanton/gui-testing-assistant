@@ -23,21 +23,21 @@ def mouseDrag(source, destination, rate=1000):
     # TODO :
     #  if it's a widget: get its position as we already do
     #  if it's a QPoint:  pass that directly
-    source = center(source)
-    dest = center(destination)
+    # source = center(source)
+    # dest = center(destination)
 
-    mouse.press(source.x(), source.y())
+    mouse.press(source)
 
     # smooth move from source to dest by moving pixel by pixel based on the specified speed
     millisecond_per_second = 1000
-    npoints = int(math.sqrt((dest.x()-source.x())**2 + (dest.y()-source.y())**2 ) / (rate/millisecond_per_second))
+    npoints = int(math.sqrt((destination.x()-source.x())**2 + (destination.y()-source.y())**2 ) / (rate/millisecond_per_second))
     for i in range(npoints):
-        x = int(source.x() + ((dest.x()-source.x())/npoints)*i)
-        y = int(source.y() + ((dest.y()-source.y())/npoints)*i)
+        x = int(source.x() + ((destination.x()-source.x())/npoints)*i)
+        y = int(source.y() + ((destination.y()-source.y())/npoints)*i)
         mouse.move(x, y)
         time.sleep(0.001)
 
-    mouse.release(*dest)
+    mouse.release(*destination)
 
 
 def center(widget):
