@@ -1,2 +1,3 @@
 mouse
 PySide6
+pytest-cov
