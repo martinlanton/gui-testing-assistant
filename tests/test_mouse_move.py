@@ -4,7 +4,7 @@ import sys
 import threading
 from PySide6 import QtTest, QtWidgets, QtCore
 
-from gui_testing_assistant import module_one
+from gui_testing_assistant import mouse_drag
 from two.module_two import my_second_var as v_2
 
 from tests.fixtures import list_view
@@ -20,24 +20,25 @@ class TestMouseMove:
         cls.view.setModel(model)
         cls.view.show()
 
-        source_index = model.index(0, 0, QtCore.QModelIndex())
-        source_item_rect = cls.view.visualRect(source_index)
-        cls.source_position = source_item_rect.center()
-
-        destination_index = model.index(1, 0, QtCore.QModelIndex())
-        destination_item_rect = cls.view.visualRect(destination_index)
-        cls.destination_position = destination_item_rect.center()
-
     def test_module_one(self):
-        assert module_one.my_first_var
+        assert mouse_drag.my_first_var
 
     def test_module_two(self):
         assert v_2 == 2
 
     def test_drag_and_drop(self):
+        source_index = self.view.model().index(0, 0, QtCore.QModelIndex())
+        source_item_rect = self.view.visualRect(source_index)
+        self.source_position = self.view.mapToGlobal(source_item_rect.center())
+
+        destination_index = self.view.model().index(1, 0, QtCore.QModelIndex())
+        destination_item_rect = self.view.visualRect(destination_index)
+        center = self.view.mapToGlobal(destination_item_rect.center())
+        self.destination_position = QtCore.QPoint(center.x(), center.y()+20)
+
         # TODO : turn this into a context manager
         dragThread = threading.Thread(
-            target=module_one.mouseDrag,
+            target=mouse_drag.mouseDrag,
             args=(self.source_position, self.destination_position),
         )
         dragThread.start()
@@ -46,4 +47,7 @@ class TestMouseMove:
             QtTest.QTest.qWait(1000)
 
         # check that the drop had the desired effect
-        assert self.view.model().rowCount() > 0
+        assert self.view.model().rowCount() == 2
+        assert self.view.model().index(0, 0, QtCore.QModelIndex()).data() == "orange"
+        assert self.view.model().index(1, 0, QtCore.QModelIndex()).data() == "apple"
+

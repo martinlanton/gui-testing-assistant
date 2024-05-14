@@ -60,6 +60,26 @@ class DraggableListView(QtWidgets.QListView):
         self.setDropIndicatorShown(True)
         self.setDragDropMode(QtWidgets.QListView.InternalMove)
 
+    def dragMoveEvent(self, event):
+        print("ENTERING MOVE EVENT.")
+        if event.mimeData().data('application/vnd.text.list'):
+            print("has data")
+            encoded_data = event.mimeData().data('application/vnd.text.list')
+            stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.ReadOnly)
+            new_items = []
+            rows = 0
+            while not stream.atEnd():
+                text = stream.readString()
+                new_items.append(text)
+                rows += 1
+            print(new_items)
+            data = new_items[0]
+            for each in range(self.model().rowCount()):
+                index = self.model().index(each, 0, QtCore.QModelIndex())
+                if index.data() == data:
+                    print(self.visualRect(index).center())
+        super().dragMoveEvent(event)
+
 
 class MainApp(QtWidgets.QApplication):
     def __init__(self):

@@ -1,3 +1,7 @@
-mouse
+# TODO : find a more expressive way to install mouse from github directly as the latest release on
+#        PyPI does not match the state of the repository : https://github.com/boppreh/mouse
+https://github.com/boppreh/mouse/archive/refs/heads/master.zip # mouse
 PySide6
 pytest-cov
+
+
