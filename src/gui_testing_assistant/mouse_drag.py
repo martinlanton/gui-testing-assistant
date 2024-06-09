@@ -1,5 +1,5 @@
 import mouse
-from PySide6 import QtCore
+from PySide6 import QtCore, QtWidgets
 
 my_first_var = True
 
@@ -12,9 +12,6 @@ def mouseDrag(source, destination):
 
     :param destination: widget or model index to get the position from. When providing a model index, a view must be provided as well.
     :type destination: QtWidgets.QWidget or QtCore.QPoint
-
-    :param rate: number of pixel per second
-    :type rate: int
     """
     # TODO : check the type of each of the source/destination arguments
     # TODO :

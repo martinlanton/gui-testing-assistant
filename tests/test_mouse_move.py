@@ -36,18 +36,32 @@ class TestMouseMove:
         center = self.view.mapToGlobal(destination_item_rect.center())
         self.destination_position = QtCore.QPoint(center.x(), center.y()+20)
 
+        # TODO : make it work
+        #  This appears to correctly open the GUI and correctly move the mouse
+        #  (with the correct coordinates), however it looks like the GUI is not
+        #  properly populated when the thread is created and starts moving the
+        #  mouse. As a result, the items aren't moved and the assertions fail,
+        #  since the QModelIndex aren't reordered in the model.
+
         # TODO : turn this into a context manager
-        dragThread = threading.Thread(
-            target=mouse_drag.mouseDrag,
-            args=(self.source_position, self.destination_position),
-        )
-        dragThread.start()
-        # cannot join, use non-blocking wait
-        while dragThread.is_alive():
-            QtTest.QTest.qWait(1000)
+        thread = Thread(self.source_position, self.destination_position)
+        thread.finished.connect(thread.deleteLater)
+        thread.start()
+
+        thread.wait()  # wait for thread to finish before asserting
 
         # check that the drop had the desired effect
         assert self.view.model().rowCount() == 2
         assert self.view.model().index(0, 0, QtCore.QModelIndex()).data() == "orange"
         assert self.view.model().index(1, 0, QtCore.QModelIndex()).data() == "apple"
 
+
+class Thread(QtCore.QThread):
+    def __init__(self, source, destination, parent=None):
+        super(Thread, self).__init__(parent)
+        self.source = source
+        self.destination = destination
+
+    def run(self):
+        mouse_drag.mouseDrag(self.source, self.destination)
+        print("FINISHED")
