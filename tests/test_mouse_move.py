@@ -1,8 +1,8 @@
 # TODO : there's a good indication of how that can be done in here :
 #  https://stackoverflow.com/questions/24144482/how-to-test-drag-and-drop-behavior-in-pyqt?rq=3
 import sys
-import threading
-from PySide6 import QtTest, QtWidgets, QtCore
+import time
+from PySide6 import QtWidgets, QtCore
 
 from gui_testing_assistant import mouse_drag
 from two.module_two import my_second_var as v_2
@@ -27,6 +27,9 @@ class TestMouseMove:
         assert v_2 == 2
 
     def test_drag_and_drop(self):
+        # TODO : potential other solution : trigger custom event :
+        #  issue : https://github.com/pytest-dev/pytest-qt/issues/428
+        #  PR : https://github.com/pytest-dev/pytest-qt/pull/429/files
         source_index = self.view.model().index(0, 0, QtCore.QModelIndex())
         source_item_rect = self.view.visualRect(source_index)
         self.source_position = self.view.mapToGlobal(source_item_rect.center())
@@ -42,6 +45,7 @@ class TestMouseMove:
         #  properly populated when the thread is created and starts moving the
         #  mouse. As a result, the items aren't moved and the assertions fail,
         #  since the QModelIndex aren't reordered in the model.
+        time.sleep(1)
 
         # TODO : turn this into a context manager
         thread = Thread(self.source_position, self.destination_position)
